@@ -9,6 +9,8 @@ import {
 import { cn, type PropsWithClassName } from "~/lib/utils";
 import { type MagicEdenCollectionResponse } from "../query/getTokensFromCollection";
 import { Fragment } from "react";
+import Image from "next/image";
+import { type InfiniteData } from "@tanstack/react-query";
 
 const tableHeaders = [
   { name: "Item" },
@@ -20,7 +22,7 @@ const tableHeaders = [
 ];
 
 interface TokenDataTableProps {
-  infiniteData?: { pages: Array<MagicEdenCollectionResponse> };
+  infiniteData: InfiniteData<MagicEdenCollectionResponse>;
 }
 
 export default function TokenDataTable({
@@ -29,12 +31,17 @@ export default function TokenDataTable({
 }: PropsWithClassName<TokenDataTableProps>) {
   return (
     <div className={cn("rounded-md border", className)}>
-      <Table>
+      <Table className="h-[30rem]">
         <TableHeader>
           <TableRow>
             {tableHeaders.map((tableHeader) => {
               return (
-                <TableHead key={tableHeader.name}>{tableHeader.name}</TableHead>
+                <TableHead
+                  key={tableHeader.name}
+                  className="sticky top-0 bg-background"
+                >
+                  {tableHeader.name}
+                </TableHead>
               );
             })}
           </TableRow>
@@ -46,12 +53,27 @@ export default function TokenDataTable({
                 {page.tokens.map((token) => {
                   return (
                     <TableRow key={token.media.image}>
-                      <TableCell>{token.token.name}</TableCell>
-                      <TableCell>0.00$</TableCell>
-                      <TableCell>0.0025 ETH</TableCell>
-                      <TableCell>+0.02%</TableCell>
-                      <TableCell>kwiss.stark</TableCell>
-                      <TableCell>1min ago</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-4">
+                          <Image
+                            src={token.media.image}
+                            height={42}
+                            width={42}
+                            alt={token.token.name}
+                            className="rounded-md"
+                          />
+                          <p>{token.token.name}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {token.market.floorAsk.price?.amount.decimal ??
+                          "Not Listed"}{" "}
+                        {token.market.floorAsk.price?.currency.symbol}
+                      </TableCell>
+                      <TableCell>Unknown</TableCell>
+                      <TableCell>Unknown</TableCell>
+                      <TableCell>{token.token.owner.slice(0, 6)}...</TableCell>
+                      <TableCell>Unknown</TableCell>
                     </TableRow>
                   );
                 })}
