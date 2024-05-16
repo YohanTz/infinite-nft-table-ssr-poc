@@ -81,7 +81,6 @@ export default function TokenDataTable({
               </Fragment>
             );
           })}
-          <TableRow></TableRow>
         </TableBody>
       </Table>
     </div>

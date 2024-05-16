@@ -52,6 +52,11 @@ export default function TokensWithFilterBar({
         className="mt-8"
       />
       <TokenDataTable className="mt-2" infiniteData={infiniteData} />
+      {isFetchingNextPage && (
+        <p className="mx-auto mt-4 text-sm text-muted-foreground">
+          Fetching more Nfts...
+        </p>
+      )}
       {hasNextPage && (
         <Button
           disabled={isFetchingNextPage}
