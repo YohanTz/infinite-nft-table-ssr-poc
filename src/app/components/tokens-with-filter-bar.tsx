@@ -3,10 +3,12 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import TokenDataTable from "./token-data-table";
 import getTokensFromCollection, {
+  sortDirections,
   type MagicEdenCollectionResponse,
 } from "../query/getTokensFromCollection";
 import { Button } from "~/components/ui/button";
 import FilterBar from "./filter-bar";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 
 interface TokensWithFilterBarProps {
   initialData: MagicEdenCollectionResponse;
@@ -15,6 +17,11 @@ interface TokensWithFilterBarProps {
 export default function TokensWithFilterBar({
   initialData,
 }: TokensWithFilterBarProps) {
+  const [sortDirection, setSortDirection] = useQueryState(
+    "sortDirection",
+    parseAsStringLiteral(sortDirections).withDefault("asc"),
+  );
+
   const {
     data: infiniteData,
     fetchNextPage,
@@ -25,11 +32,12 @@ export default function TokensWithFilterBar({
       pages: [initialData],
       pageParams: [],
     },
-    queryKey: ["collectionInfo"],
+    queryKey: ["collectionInfo", sortDirection],
     queryFn: ({ pageParam }) =>
       getTokensFromCollection({
         nextCursor: pageParam,
         collection: "0xed5af388653567af2f388e6224dc7c4b3241c544",
+        sortDirection,
       }),
     getNextPageParam: (lastPage) => lastPage.continuation ?? undefined,
 
@@ -38,8 +46,12 @@ export default function TokensWithFilterBar({
 
   return (
     <>
-      <FilterBar />
-      <TokenDataTable className="mt-8" infiniteData={infiniteData} />
+      <FilterBar
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+        className="mt-8"
+      />
+      <TokenDataTable className="mt-2" infiniteData={infiniteData} />
       {hasNextPage && (
         <Button
           disabled={isFetchingNextPage}

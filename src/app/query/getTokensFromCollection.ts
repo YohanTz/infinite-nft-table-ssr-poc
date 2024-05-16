@@ -19,14 +19,21 @@ export interface MagicEdenCollectionResponse {
   }>;
 }
 
+export const sortDirections = ["asc", "desc"] as const;
+
 export default async function getTokensFromCollection({
   nextCursor,
   collection,
+  sortDirection,
 }: {
   nextCursor?: string;
   collection: string;
+  sortDirection: (typeof sortDirections)[number];
 }) {
-  const queryParams = [`collection=${collection}`];
+  const queryParams = [
+    `collection=${collection}`,
+    `sortDirection=${sortDirection}`,
+  ];
 
   if (nextCursor) {
     queryParams.push(`continuation=${nextCursor}`);
