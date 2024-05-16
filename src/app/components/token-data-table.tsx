@@ -25,6 +25,7 @@ interface TokenDataTableProps {
   infiniteData: InfiniteData<MagicEdenCollectionResponse>;
 }
 
+// TODO: Component per type of cell
 export default function TokenDataTable({
   className,
   infiniteData,

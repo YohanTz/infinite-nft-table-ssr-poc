@@ -17,12 +17,16 @@ export default function FiltersBar({
       <Button
         onClick={() => setSortDirection("asc")}
         disabled={sortDirection === "asc"}
+        size="sm"
+        variant="secondary"
       >
         Sort ascending
       </Button>
       <Button
         onClick={() => setSortDirection("desc")}
         disabled={sortDirection === "desc"}
+        size="sm"
+        variant="secondary"
       >
         Sort descending
       </Button>
