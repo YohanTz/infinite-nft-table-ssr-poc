@@ -23,6 +23,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <p className="text-muted-foreground">✅ SSR (with query params)</p>
         <p className="text-muted-foreground">✅ Sort</p>
         <p className="text-muted-foreground">✅ Sort State in query params</p>
+        <p className="text-muted-foreground">✅ Infinite query</p>
         <p className="text-muted-foreground">❌ Infinite Scroll</p>
       </div>
 
