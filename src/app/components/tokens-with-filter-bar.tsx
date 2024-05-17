@@ -9,6 +9,7 @@ import getTokensFromCollection, {
 import { Button } from "~/components/ui/button";
 import FilterBar from "./filter-bar";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
+import { useMemo } from "react";
 
 interface TokensWithFilterBarProps {
   initialData: MagicEdenCollectionResponse;
@@ -44,6 +45,11 @@ export default function TokensWithFilterBar({
     initialPageParam: undefined as undefined | string,
   });
 
+  const flatData = useMemo(
+    () => infiniteData.pages.flatMap((page) => page.tokens),
+    [infiniteData],
+  );
+
   return (
     <>
       <FilterBar
@@ -51,13 +57,19 @@ export default function TokensWithFilterBar({
         setSortDirection={setSortDirection}
         className="mt-8"
       />
-      <TokenDataTable className="mt-2" infiniteData={infiniteData} />
+      <TokenDataTable
+        className="mt-2"
+        tokensData={flatData}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+      />
       {isFetchingNextPage && (
         <p className="mx-auto mt-4 text-sm text-muted-foreground">
           Fetching more Nfts...
         </p>
       )}
-      {hasNextPage && (
+      {/* {hasNextPage && (
         <Button
           disabled={isFetchingNextPage}
           onClick={() => fetchNextPage()}
@@ -66,7 +78,7 @@ export default function TokensWithFilterBar({
         >
           {isFetchingNextPage ? "Loading..." : "Fetch more NFTs!"}
         </Button>
-      )}
+      )} */}
     </>
   );
 }

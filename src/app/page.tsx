@@ -19,12 +19,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <h1 className="font-sans text-2xl">
         NFT Table SSR + Infinite Scroll + Filters + State in query params
       </h1>
-      <div className="mt-4 flex flex-col gap-2">
+      <div className="mt-4 flex flex-col gap-1">
         <p className="text-muted-foreground">✅ SSR (with query params)</p>
         <p className="text-muted-foreground">✅ Sort</p>
         <p className="text-muted-foreground">✅ Sort State in query params</p>
         <p className="text-muted-foreground">✅ Infinite query</p>
-        <p className="text-muted-foreground">❌ Infinite Scroll</p>
+        <p className="text-muted-foreground">✅ Infinite Scroll</p>
+        <p className="text-muted-foreground">✅ Virtualized Table</p>
+        <p className="text-muted-foreground">❌ Fix Row / Cell size</p>
       </div>
 
       <TokensWithFilterBar initialData={data} />
