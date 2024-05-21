@@ -11,7 +11,7 @@ const Table = React.forwardRef<
     ref={ref}
     {...props}
   >
-    <table className="w-full caption-bottom text-sm">{children}</table>
+    <table className="grid w-full caption-bottom text-sm">{children}</table>
   </div>
 ));
 Table.displayName = "Table";

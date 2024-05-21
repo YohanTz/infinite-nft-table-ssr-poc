@@ -10,19 +10,15 @@ import {
 } from "~/components/ui/table";
 import { cn, type PropsWithClassName } from "~/lib/utils";
 import { type MagicEdenCollectionResponse } from "../query/getTokensFromCollection";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import { useVirtualizer } from "@tanstack/react-virtual";
-
-const tableHeaders = [
-  { name: "Item" },
-  { name: "Current Price" },
-  { name: "Last Sold" },
-  { name: "Floor difference" },
-  { name: "Owner" },
-  { name: "Time listed" },
-];
-
+import {
+  type ColumnDef,
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+} from "@tanstack/react-table";
 interface TokenDataTableProps {
   tokensData: MagicEdenCollectionResponse["tokens"];
   isFetchingNextPage: boolean;
@@ -39,6 +35,67 @@ export default function TokenDataTable({
   fetchNextPage,
 }: PropsWithClassName<TokenDataTableProps>) {
   const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const columns = useMemo<
+    ColumnDef<MagicEdenCollectionResponse["tokens"][number]>[]
+  >(
+    () => [
+      {
+        accessorKey: "token",
+        header: "Item",
+        cell: ({ row: { original } }) => {
+          return <div>OUI</div>;
+        },
+        size: 60,
+      },
+      {
+        accessorKey: "token",
+        header: "Current Price",
+        // cell: (info) => info.getValue(),
+        cell: () => {
+          return <div>OUI</div>;
+        },
+      },
+      {
+        accessorKey: "token",
+        header: "Last Sold",
+
+        cell: () => {
+          return <div>OUI</div>;
+        },
+      },
+      {
+        accessorKey: "token",
+        header: "Floor difference",
+        cell: () => {
+          return <div>OUI</div>;
+        },
+      },
+      {
+        accessorKey: "token",
+        header: "Owner",
+        cell: () => {
+          return <div>OUI</div>;
+        },
+      },
+      {
+        accessorKey: "token",
+        header: "Time listed",
+        cell: () => {
+          return <div>OUI</div>;
+        },
+      },
+    ],
+    [],
+  );
+
+  const table = useReactTable({
+    data: tokensData,
+    columns,
+    manualSorting: true,
+    manualFiltering: true,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   const fetchMoreOnBottomReached = useCallback(
     (containerRefElement?: HTMLDivElement | null) => {
@@ -62,8 +119,10 @@ export default function TokenDataTable({
     fetchMoreOnBottomReached(tableContainerRef.current);
   }, [fetchMoreOnBottomReached]);
 
+  const { rows } = table.getRowModel();
+
   const rowVirtualizer = useVirtualizer({
-    count: tokensData.length,
+    count: rows.length,
     estimateSize: () => 75, // Estimation of row height for accurate scrollbar dragging
     getScrollElement: () => tableContainerRef.current,
     // Measure dynamic row height, except in firefox because it measures table border height incorrectly
@@ -78,47 +137,69 @@ export default function TokenDataTable({
   return (
     <div className={cn("rounded-md border", className)}>
       <Table
-        className="h-[28rem]"
+        className="grid h-[28rem] w-full"
         ref={tableContainerRef}
         onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
       >
-        <TableHeader>
-          <TableRow>
-            {tableHeaders.map((tableHeader) => {
-              return (
-                <TableHead
-                  key={tableHeader.name}
-                  className="sticky top-0 z-10 bg-background"
-                >
-                  {tableHeader.name}
-                </TableHead>
-              );
-            })}
-          </TableRow>
+        <TableHeader className="sticky top-0 z-10 grid">
+          {table.getHeaderGroups().map((headerGroup) => {
+            return (
+              <TableRow key={headerGroup.id} className="flex w-full">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className="flex bg-background"
+                      style={{ width: header.getSize() }}
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            );
+          })}
         </TableHeader>
         <TableBody
-          className="relative"
+          className="relative grid"
           style={{
             height: `${rowVirtualizer.getTotalSize()}px`, // Tells scrollbar how big the table is
           }}
         >
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const token = tokensData[virtualRow.index];
-            if (token === undefined) {
+            const row = rows[virtualRow.index];
+            if (row === undefined) {
               return null;
             }
 
             return (
               <TableRow
-                key={token.media.image}
+                key={row.id}
                 data-index={virtualRow.index} // Needed for dynamic row height measurement
                 ref={(node) => rowVirtualizer.measureElement(node)} // Measure dynamic row height
-                className="absolute w-full"
+                className="absolute flex w-full"
                 style={{
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
-                <TableCell>
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <TableCell
+                      key={cell.id}
+                      style={{ width: cell.column.getSize() }}
+                      className="flex"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  );
+                })}
+                {/* <TableCell>
                   <div className="flex items-center gap-4">
                     <Image
                       src={token.media.image}
@@ -137,7 +218,7 @@ export default function TokenDataTable({
                 <TableCell>Unknown</TableCell>
                 <TableCell>Unknown</TableCell>
                 <TableCell>{token.token.owner.slice(0, 6)}...</TableCell>
-                <TableCell>Unknown</TableCell>
+                <TableCell>Unknown</TableCell> */}
               </TableRow>
             );
           })}
