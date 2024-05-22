@@ -29,6 +29,7 @@ export default function TokensWithFilterBar({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
+    refetchInterval: 10_000,
     initialData: {
       pages: [initialData],
       pageParams: [],
@@ -69,16 +70,6 @@ export default function TokensWithFilterBar({
           Fetching more Nfts...
         </p>
       )}
-      {/* {hasNextPage && (
-        <Button
-          disabled={isFetchingNextPage}
-          onClick={() => fetchNextPage()}
-          variant="secondary"
-          className="mt-4"
-        >
-          {isFetchingNextPage ? "Loading..." : "Fetch more NFTs!"}
-        </Button>
-      )} */}
     </>
   );
 }

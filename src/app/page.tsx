@@ -26,7 +26,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <p className="text-muted-foreground">✅ Infinite query</p>
         <p className="text-muted-foreground">✅ Infinite Scroll</p>
         <p className="text-muted-foreground">✅ Virtualized Table</p>
-        <p className="text-muted-foreground">❌ Fix Row / Cell size</p>
       </div>
 
       <TokensWithFilterBar initialData={data} />

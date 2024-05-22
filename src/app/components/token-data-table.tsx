@@ -12,7 +12,7 @@ import { cn, type PropsWithClassName } from "~/lib/utils";
 import { type MagicEdenCollectionResponse } from "../query/getTokensFromCollection";
 import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { elementScroll, useVirtualizer } from "@tanstack/react-virtual";
 
 const tableHeaders = [
   { name: "Item" },
@@ -63,6 +63,8 @@ export default function TokenDataTable({
   }, [fetchMoreOnBottomReached]);
 
   const rowVirtualizer = useVirtualizer({
+    // Approcimage initial rect for SSR
+    initialRect: { height: 1000, width: 1200 },
     count: tokensData.length,
     estimateSize: () => 75, // Estimation of row height for accurate scrollbar dragging
     getScrollElement: () => tableContainerRef.current,
@@ -76,19 +78,20 @@ export default function TokenDataTable({
   });
 
   return (
-    <div className={cn("rounded-md border", className)}>
+    <div className={cn("flex flex-1 flex-col rounded-md border", className)}>
       <Table
-        className="h-[28rem]"
+        className="flex-[1_1_0]"
         ref={tableContainerRef}
         onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
       >
         <TableHeader>
-          <TableRow>
+          {/* TODO: MIN / MAX ON GRID COLS WIDTH */}
+          <TableRow className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] items-center">
             {tableHeaders.map((tableHeader) => {
               return (
                 <TableHead
                   key={tableHeader.name}
-                  className="sticky top-0 z-10 bg-background"
+                  className="sticky top-0 z-10 flex items-center bg-background"
                 >
                   {tableHeader.name}
                 </TableHead>
@@ -113,7 +116,7 @@ export default function TokenDataTable({
                 key={token.media.image}
                 data-index={virtualRow.index} // Needed for dynamic row height measurement
                 ref={(node) => rowVirtualizer.measureElement(node)} // Measure dynamic row height
-                className="absolute w-full"
+                className="absolute grid w-full grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] items-center"
                 style={{
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
@@ -141,32 +144,6 @@ export default function TokenDataTable({
               </TableRow>
             );
           })}
-          {/* {tokensData.map((token) => {
-            return (
-              <TableRow key={token.media.image}>
-                <TableCell>
-                  <div className="flex items-center gap-4">
-                    <Image
-                      src={token.media.image}
-                      height={42}
-                      width={42}
-                      alt={token.token.name}
-                      className="rounded-md"
-                    />
-                    <p>{token.token.name}</p>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {token.market.floorAsk.price?.amount.decimal ?? "Not Listed"}{" "}
-                  {token.market.floorAsk.price?.currency.symbol}
-                </TableCell>
-                <TableCell>Unknown</TableCell>
-                <TableCell>Unknown</TableCell>
-                <TableCell>{token.token.owner.slice(0, 6)}...</TableCell>
-                <TableCell>Unknown</TableCell>
-              </TableRow>
-            );
-          })} */}
         </TableBody>
       </Table>
     </div>

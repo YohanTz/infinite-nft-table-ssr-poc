@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="bg-background text-foreground">
+      <body className="overscroll-y-none bg-background text-foreground">
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>
