@@ -64,7 +64,7 @@ export default function TokenDataTable({
 
   const rowVirtualizer = useWindowVirtualizer({
     // Approcimage initial rect for SSR
-    initialRect: { height: 1000, width: 1200 },
+    initialRect: { height: 1080, width: 1920 },
     count: tokensData.length,
     estimateSize: () => 75, // Estimation of row height for accurate scrollbar dragging
     // Measure dynamic row height, except in firefox because it measures table border height incorrectly
