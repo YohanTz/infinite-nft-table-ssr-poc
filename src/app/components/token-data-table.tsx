@@ -10,9 +10,9 @@ import {
 } from "~/components/ui/table";
 import { cn, type PropsWithClassName } from "~/lib/utils";
 import { type MagicEdenCollectionResponse } from "../query/getTokensFromCollection";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import Image from "next/image";
-import { elementScroll, useVirtualizer } from "@tanstack/react-virtual";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 
 const tableHeaders = [
   { name: "Item" },
@@ -38,36 +38,35 @@ export default function TokenDataTable({
   hasNextPage,
   fetchNextPage,
 }: PropsWithClassName<TokenDataTableProps>) {
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-
-  const fetchMoreOnBottomReached = useCallback(
-    (containerRefElement?: HTMLDivElement | null) => {
-      if (containerRefElement) {
-        const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
-        // Once the user has scrolled within 750px of the bottom of the table, fetch more data if possible
-        if (
-          scrollHeight - scrollTop - clientHeight < 750 &&
-          !isFetchingNextPage &&
-          hasNextPage
-        ) {
-          fetchNextPage();
-        }
+  const fetchMoreOnBottomReached = useCallback(() => {
+    if (document.body) {
+      const { scrollHeight } = window.document.body;
+      // Once the user has scrolled within 500px of the bottom of the window, fetch more data if possible
+      if (
+        scrollHeight - window.scrollY - window.innerHeight < 750 &&
+        !isFetchingNextPage &&
+        hasNextPage
+      ) {
+        fetchNextPage();
       }
-    },
-    [fetchNextPage, hasNextPage, isFetchingNextPage],
-  );
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   // A check on mount and after a fetch to see if the table is already scrolled to the bottom and immediately needs to fetch more data
   useEffect(() => {
-    fetchMoreOnBottomReached(tableContainerRef.current);
+    fetchMoreOnBottomReached();
+
+    window.addEventListener("scroll", fetchMoreOnBottomReached);
+    return () => {
+      window.removeEventListener("scroll", fetchMoreOnBottomReached);
+    };
   }, [fetchMoreOnBottomReached]);
 
-  const rowVirtualizer = useVirtualizer({
+  const rowVirtualizer = useWindowVirtualizer({
     // Approcimage initial rect for SSR
     initialRect: { height: 1000, width: 1200 },
     count: tokensData.length,
     estimateSize: () => 75, // Estimation of row height for accurate scrollbar dragging
-    getScrollElement: () => tableContainerRef.current,
     // Measure dynamic row height, except in firefox because it measures table border height incorrectly
     measureElement:
       typeof window !== "undefined" &&
@@ -79,11 +78,7 @@ export default function TokenDataTable({
 
   return (
     <div className={cn("flex flex-1 flex-col rounded-md border", className)}>
-      <Table
-        className="flex-[1_1_0]"
-        ref={tableContainerRef}
-        onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
-      >
+      <Table>
         <TableHeader>
           {/* TODO: MIN / MAX ON GRID COLS WIDTH */}
           <TableRow className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] items-center">
